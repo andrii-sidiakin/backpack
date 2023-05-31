@@ -19,6 +19,13 @@ int main() {
     static_assert(Empty::size == 0);
     static_assert(Empty::is_empty == true);
 
+    // element-index
+    static_assert(bp::element_index_v<R_cif, char> == 0);
+    static_assert(bp::element_index_v<R_cif, float> == 2);
+    // these lines fail at compile time (as intended)
+    // auto i = bp::element_index_v<Empty, char>;
+    // auto i = bp::element_index_v<R_cif, double>;
+
     // select-if
     static_assert(
         std::is_same_v<bp::select_if_t<Empty, std::is_integral>, Empty>);

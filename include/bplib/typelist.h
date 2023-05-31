@@ -23,7 +23,11 @@ struct concat<typelist<As...>, typelist<Bs...>> {
 ///
 ///
 template <typename AA, typename T> struct element_index;
-/// stop rule:
+/// stop rule: not found
+template <typename T> struct element_index<typelist<>, T> {
+    static constexpr auto value = 0u;
+};
+/// stop rule: found
 template <typename... As, typename T>
 struct element_index<typelist<T, As...>, T> {
     static constexpr auto value = 0u;

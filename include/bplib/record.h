@@ -13,6 +13,7 @@ template <typename... Es> struct record {
     /// defines whether record is empty or not
     static constexpr auto is_empty = (size == 0);
 
+    ///
     template <typename E> struct contains {
         static constexpr auto value =
             bpx::element_exists<bpx::typelist<Es...>, E>::value;
@@ -53,6 +54,20 @@ template <typename... Ts> struct to_record<bp::record<Ts...>> {
     using type = bp::record<Ts...>;
 };
 template <typename T> using to_record_t = typename to_record<T>::type;
+
+///
+///
+///
+
+template <Record R, typename E> struct element_index {
+    static constexpr auto value =
+        bpx::element_index<bp::to_typelist_t<R>, E>::value;
+
+    static_assert(value < R::size, "element not found");
+};
+///
+template <Record R, typename E>
+static constexpr auto element_index_v = element_index<R, E>::value;
 
 ///
 ///
