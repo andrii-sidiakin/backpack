@@ -20,7 +20,24 @@ struct concat<typelist<As...>, typelist<Bs...>> {
 };
 
 ///
+///
+///
+template <typename AA, typename T> struct element_index;
+/// stop rule:
+template <typename... As, typename T>
+struct element_index<typelist<T, As...>, T> {
+    static constexpr auto value = 0u;
+};
+///
+template <typename Ai, typename... As, typename T>
+struct element_index<typelist<Ai, As...>, T> {
+    static constexpr auto value = 1u + element_index<typelist<As...>, T>::value;
+};
+
+///
 /// Checks whether element is present in a given typelist.
+///
+/// TODO: consider implementation based on element_index<>
 ///
 template <typename AA, typename T> struct element_exists : std::false_type {};
 /// stop rule:
@@ -80,6 +97,20 @@ struct index_if {
     };
 
     using type = typename impl<std::index_sequence<>, 0, AA>::type;
+};
+
+///
+///
+///
+template <typename AA, typename BB> struct make_index {
+    ///
+    template <typename XX> struct impl;
+    ///
+    template <typename... Xs> struct impl<typelist<Xs...>> {
+        using type = std::index_sequence<element_index<BB, Xs>::value...>;
+    };
+
+    using type = typename impl<AA>::type;
 };
 
 ///

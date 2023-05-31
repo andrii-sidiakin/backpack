@@ -97,4 +97,29 @@ template <Record R, Record Q> struct intersect {
 template <Record R, Record Q>
 using intersect_t = typename intersect<R, Q>::type;
 
+///
+/// Creates index sequence mapping R elements to Q
+///
+template <Record R, Record Q> struct make_index {
+    using type = typename bpx::make_index<bp::to_typelist_t<R>,
+                                          bp::to_typelist_t<Q>>::type;
+};
+///
+template <Record R, Record Q>
+using make_index_t = typename make_index<R, Q>::type;
+
+///
+///
+///
+template <Record R, typename Index> struct select_index;
+///
+template <Record R, std::size_t... Is>
+struct select_index<R, std::index_sequence<Is...>> {
+    using type = bp::to_record_t<typename bpx::select_at<
+        bp::to_typelist_t<R>, std::index_sequence<Is...>>::type>;
+};
+///
+template <Record R, typename Index>
+using select_index_t = typename select_index<R, Index>::type;
+
 } // namespace bp
