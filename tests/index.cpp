@@ -18,9 +18,18 @@ auto proceed([[maybe_unused]] Args &&...args) {
 
 int main() {
     // types I want in order I want
-    using header_type = bp::record<double, char>;
-    auto header = proceed<header_type>(1, 'b', 3.14f, "D", 0xf, 9.8);
-    static_assert(std::is_same_v<decltype(header), header_type>);
-
+    using header_type = bp::record<double, long, char>;
+    {
+        // all are present
+        using expect_type = header_type;
+        auto header = proceed<header_type>(1, 'b', 3.14f, "D", 5L, 9.8);
+        static_assert(std::is_same_v<decltype(header), expect_type>);
+    }
+    {
+        // not all are present
+        using expect_type = bp::record<double, char>;
+        auto header = proceed<header_type>(1, 'b', 3.14f, "D", 5, 9.8);
+        static_assert(std::is_same_v<decltype(header), expect_type>);
+    }
     return 0;
 }
