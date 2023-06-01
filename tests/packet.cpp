@@ -1,42 +1,27 @@
 #include <bplib/packet.h>
 
-#include <cstdlib>
-#include <cstring>
-
-#define bp_expect(cond)                                                        \
-    if (!(cond)) {                                                             \
-        std::abort();                                                          \
-    }
-
-template <typename Spec, typename... Args> auto make_packet(Args &&...args) {
-    return bp::packet<bp::record<Args...>, Spec>(std::forward<Args>(args)...);
-}
-
-struct integral_header_spec {
-    template <typename T> using is_header = std::is_integral<T>;
-};
-
 int main() {
 
+    auto p = bp::packet{'a', 2, 3.14f, 5L, 6.};
+
     {
-        bp::packet pkt{10, 3.14, "text"};
-        using header_type = decltype(pkt.header());
-        static_assert(std::tuple_size_v<header_type> == 0);
+        auto [c, i, l] = p.select_if<std::is_integral>();
+        static_assert(std::is_same_v<decltype(c), char &>);
+        static_assert(std::is_same_v<decltype(i), int &>);
+        static_assert(std::is_same_v<decltype(l), long &>);
     }
 
     {
-        auto pkt = make_packet<integral_header_spec>(10, 3.14, "text");
+        auto [d, f] = p.template select<bp::record<double, float>>();
+        static_assert(std::is_same_v<decltype(d), double &>);
+        static_assert(std::is_same_v<decltype(f), float &>);
+    }
 
-        auto h = pkt.header();
-        using header_type = decltype(h);
-        static_assert(std::tuple_size_v<header_type> == 1);
-        bp_expect(std::get<0>(h) == 10);
-
-        auto p = pkt.payload();
-        using payload_type = decltype(p);
-        static_assert(std::tuple_size_v<payload_type> == 2);
-        bp_expect(std::get<0>(p) == 3.14);
-        bp_expect(strcmp(std::get<1>(p), "text") == 0);
+    {
+        auto [l, i, f] = p.select_index(std::index_sequence<3, 1, 2>{});
+        static_assert(std::is_same_v<decltype(l), long &>);
+        static_assert(std::is_same_v<decltype(i), int &>);
+        static_assert(std::is_same_v<decltype(f), float &>);
     }
 
     return 0;

@@ -21,7 +21,7 @@ template <typename... Es> struct record {
 };
 
 ///
-///
+/// Checks if Type is a record type
 ///
 template <typename> struct is_record : std::false_type {};
 ///
@@ -56,9 +56,8 @@ template <typename... Ts> struct to_record<bp::record<Ts...>> {
 template <typename T> using to_record_t = typename to_record<T>::type;
 
 ///
+/// Returns an index of element in record
 ///
-///
-
 template <Record R, typename E> struct element_index {
     static constexpr auto value =
         bpx::element_index<bp::to_typelist_t<R>, E>::value;

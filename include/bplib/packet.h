@@ -1,54 +1,53 @@
 #pragma once
 
-#include <tuple>
-#include <type_traits>
-
 #include "record.h"
+
+#include <tuple>
 
 namespace bp {
 
-struct raw_data_packet_spec {
-    template <typename T> struct is_header : std::false_type {};
-};
-
 ///
 ///
 ///
-template <typename TT, typename Spec = raw_data_packet_spec> class packet;
-///
-template <typename... Ts>
-packet(Ts &&...) -> packet<bp::record<Ts...>, raw_data_packet_spec>;
-///
-template <typename... Ts, typename Spec> class packet<bp::record<Ts...>, Spec> {
+template <typename... Ts> class packet {
   public:
     using record_type = bp::record<Ts...>;
-    using header_type = bp::select_if_t<record_type, Spec::template is_header>;
-    using header_index_type = bp::make_index_t<header_type, record_type>;
-    using payload_type = bp::subtract_t<record_type, header_type>;
-    using payload_index_type = bp::make_index_t<payload_type, record_type>;
 
   public:
     explicit packet(Ts &&...args) noexcept
         : m_model(std::forward<Ts>(args)...) {
     }
 
-    constexpr auto header() noexcept {
-        return select_tuple(m_model, header_index_type{});
+    template <Record R> auto select() {
+        using index = bp::make_index_t<R, record_type>;
+        return select_tuple(m_model, index{});
     }
 
-    constexpr auto payload() noexcept {
-        return select_tuple(m_model, payload_index_type{});
+    template <template <typename> class Pred> auto select_if() {
+        using match = bp::select_if_t<record_type, Pred>;
+        using index = bp::make_index_t<match, record_type>;
+        return select_tuple(m_model, index{});
+    }
+
+    template <std::size_t... Is>
+    auto select_index(
+        std::index_sequence<Is...> index = std::index_sequence<Is...>{}) {
+        return select_tuple(m_model, index);
     }
 
   private:
-    template <std::size_t... Is>
-    static constexpr auto select_tuple(auto &tuple,
+    template <typename... Us, std::size_t... Is>
+    static constexpr auto select_tuple(std::tuple<Us...> &tuple,
                                        std::index_sequence<Is...>) noexcept {
+        static_assert(((Is < sizeof...(Us)) && ...), "index out of range");
         return std::tie(std::get<Is>(tuple)...);
     }
 
   private:
     std::tuple<Ts...> m_model;
 };
+
+///
+template <typename... Ts> packet(Ts &&...) -> packet<Ts...>;
 
 } // namespace bp
