@@ -25,11 +25,22 @@ int main() {
         auto header = proceed<header_type>(1, 'b', 3.14f, "D", 5L, 9.8);
         static_assert(std::is_same_v<decltype(header), expect_type>);
     }
+
     {
         // not all are present
         using expect_type = bp::record<double, char>;
         auto header = proceed<header_type>(1, 'b', 3.14f, "D", 5, 9.8);
         static_assert(std::is_same_v<decltype(header), expect_type>);
     }
+
+    {
+        using record_type = bp::record<float, long, void, char, int>;
+        using expect_type = bp::record<int, bool, long>;
+        using index = bp::make_index_t<expect_type, record_type>;
+        using diff_index = bp::make_diff_index_t<expect_type, record_type>;
+        static_assert(std::is_same_v<index, std::index_sequence<4, 1>>);
+        static_assert(std::is_same_v<diff_index, std::index_sequence<0, 2, 3>>);
+    }
+
     return 0;
 }

@@ -12,7 +12,8 @@ int main() {
     }
 
     {
-        auto [d, f] = p.template select<bp::record<double, float>>();
+        auto [d, f] = p.template select<
+            bp::record<int *, double, char *, float, bool *>>();
         static_assert(std::is_same_v<decltype(d), double &>);
         static_assert(std::is_same_v<decltype(f), float &>);
     }

@@ -107,14 +107,24 @@ struct index_if {
 ///
 ///
 template <typename AA, typename BB> struct make_index {
-    ///
-    template <typename XX> struct impl;
-    ///
-    template <typename... Xs> struct impl<typelist<Xs...>> {
-        using type = std::index_sequence<element_index<BB, Xs>::value...>;
+    template <typename II, typename XX> struct impl;
+
+    template <std::size_t... Is>
+    struct impl<std::index_sequence<Is...>, typelist<>> {
+        using type = std::index_sequence<Is...>;
     };
 
-    using type = typename impl<AA>::type;
+    template <std::size_t... Is, typename Xi, typename... Xs>
+    struct impl<std::index_sequence<Is...>, typelist<Xi, Xs...>> {
+        using type = std::conditional_t<
+            element_exists<BB, Xi>::value,
+            typename impl<
+                std::index_sequence<Is..., element_index<BB, Xi>::value>,
+                typelist<Xs...>>::type,
+            typename impl<std::index_sequence<Is...>, typelist<Xs...>>::type>;
+    };
+
+    using type = typename impl<std::index_sequence<>, AA>::type;
 };
 
 ///

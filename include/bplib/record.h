@@ -136,4 +136,17 @@ struct select_index<R, std::index_sequence<Is...>> {
 template <Record R, typename Index>
 using select_index_t = typename select_index<R, Index>::type;
 
+///
+///
+///
+template <Record R, Record Q> struct make_diff_index {
+    using match_index = bp::make_index_t<R, Q>;
+    using match = bp::select_index_t<Q, match_index>;
+    using not_match = bp::subtract_t<Q, match>;
+    using type = make_index_t<not_match, Q>;
+};
+///
+template <Record R, Record Q>
+using make_diff_index_t = typename make_diff_index<R, Q>::type;
+
 } // namespace bp
