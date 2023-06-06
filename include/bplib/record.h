@@ -69,6 +69,17 @@ template <Record R, typename E>
 static constexpr auto element_index_v = element_index<R, E>::value;
 
 ///
+/// Checks if element E is present in a record R
+///
+template <Record R, typename E> struct element_exists {
+    static constexpr auto value =
+        bpx::element_exists<bp::to_typelist_t<R>, E>::value;
+};
+///
+template <Record R, typename E>
+static constexpr auto element_exists_v = element_exists<R, E>::value;
+
+///
 ///
 ///
 template <Record R, template <typename> class Pred, bool Exp = true>
