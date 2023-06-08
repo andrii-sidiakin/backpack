@@ -1,3 +1,4 @@
+#include "bplib/record.h"
 #include <bplib/bplib.h>
 
 #include <utility>
@@ -70,6 +71,13 @@ int main() {
         using target = R<double, int *, char>;
         using expect = R<double, char>;
         static_assert(std::is_same_v<bp::intersect_t<target, origin>, expect>);
+    }
+
+    {
+        static_assert(std::is_same_v<bp::concat_many_t<R_f>, R_f>);
+        static_assert(std::is_same_v<bp::concat_many_t<R_f, R_d>, R_fd>);
+        static_assert(
+            std::is_same_v<bp::concat_many_t<R_ci, R_f, R_d>, R_cifd>);
     }
 
     return 0;
