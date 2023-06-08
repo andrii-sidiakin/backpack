@@ -137,4 +137,27 @@ struct select_if {
     using type = typename select_at<AA, index_type>::type;
 };
 
+///
+///
+///
+template <typename AA> struct unique;
+template <typename... As> struct unique<typelist<As...>> {
+
+    template <typename XX, typename YY> struct impl;
+
+    template <typename... Xs> struct impl<typelist<Xs...>, typelist<>> {
+        using type = typelist<Xs...>;
+    };
+
+    template <typename... Xs, typename Yi, typename... Ys>
+    struct impl<typelist<Xs...>, typelist<Yi, Ys...>> {
+        using type = std::conditional_t<
+            element_exists<typelist<Xs...>, Yi>::value,
+            typename impl<typelist<Xs...>, typelist<Ys...>>::type,
+            typename impl<typelist<Xs..., Yi>, typelist<Ys...>>::type>;
+    };
+
+    using type = typename impl<typelist<>, typelist<As...>>::type;
+};
+
 } // namespace bpx

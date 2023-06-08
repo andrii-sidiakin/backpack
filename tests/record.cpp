@@ -80,5 +80,10 @@ int main() {
             std::is_same_v<bp::concat_many_t<R_ci, R_f, R_d>, R_cifd>);
     }
 
+    {
+        static_assert(
+            std::is_same_v<bp::unique_t<R<char, int, int>>, R<char, int>>);
+    }
+
     return 0;
 }

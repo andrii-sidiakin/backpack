@@ -130,6 +130,15 @@ template <Record... Rs> using concat_many_t = typename concat_many<Rs...>::type;
 ///
 ///
 ///
+template <Record R> struct unique {
+    using type = to_record_t<typename bpx::unique<to_typelist_t<R>>::type>;
+};
+///
+template <Record R> using unique_t = typename unique<R>::type;
+
+///
+///
+///
 template <Record R, Record Q> struct subtract {
     using type = remove_if_t<R, Q::template contains, true>;
 };
