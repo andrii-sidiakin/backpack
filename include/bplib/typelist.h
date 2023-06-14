@@ -22,6 +22,19 @@ struct concat<typelist<As...>, typelist<Bs...>> {
 ///
 ///
 ///
+template <typename AA, typename... Bs> struct concat_many;
+template <typename... As> struct concat_many<typelist<As...>> {
+    using type = typelist<As...>;
+};
+template <typename... As, typename B0, typename... Bs>
+struct concat_many<typelist<As...>, B0, Bs...> {
+    using type = typename concat<typelist<As...>,
+                                 typename concat_many<B0, Bs...>::type>::type;
+};
+
+///
+///
+///
 template <typename AA, typename T> struct element_index;
 /// stop rule: not found
 template <typename T> struct element_index<typelist<>, T> {

@@ -114,15 +114,8 @@ template <Record R, Record Q> struct concat {
 template <Record R, Record Q> using concat_t = typename concat<R, Q>::type;
 
 template <Record... Rs> struct concat_many {
-    template <typename RR> struct impl;
-    template <> struct impl<bp::record<>> { using type = bp::record<>; };
-    template <Record X> struct impl<bp::record<X>> { using type = X; };
-    template <Record X, Record Y0, Record... Ys>
-    struct impl<bp::record<X, Y0, Ys...>> {
-        using type = concat_t<X, typename impl<bp::record<Y0, Ys...>>::type>;
-    };
-
-    using type = typename impl<bp::record<Rs...>>::type;
+    using type =
+        to_record_t<typename bpx::concat_many<to_typelist_t<Rs>...>::type>;
 };
 ///
 template <Record... Rs> using concat_many_t = typename concat_many<Rs...>::type;
