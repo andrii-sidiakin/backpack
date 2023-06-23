@@ -8,12 +8,6 @@ auto proceed([[maybe_unused]] Args &&...args) {
     using actual_index = bp::make_index_t<actual_type, record_type>;
 
     return bp::select_index_t<record_type, actual_index>{};
-
-    /*using others_type = bp::subtract_t<record_type, actual_type>;
-    using others_index = bp::make_index_t<others_type, record_type>;
-    using first_part = bp::select_index_t<record_type, actual_index>;
-    using second_part = bp::select_index_t<record_type, actual_index>;
-    return bp::record<first_part, second_part>{};*/
 }
 
 int main() {

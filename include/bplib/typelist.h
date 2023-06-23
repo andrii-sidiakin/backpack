@@ -20,9 +20,12 @@ struct concat<typelist<As...>, typelist<Bs...>> {
 };
 
 ///
+/// Concatenates many typelists
 ///
-///
-template <typename AA, typename... Bs> struct concat_many;
+template <typename... As> struct concat_many;
+template <> struct concat_many<> {
+    using type = typelist<>;
+};
 template <typename... As> struct concat_many<typelist<As...>> {
     using type = typelist<As...>;
 };
@@ -31,6 +34,18 @@ struct concat_many<typelist<As...>, B0, Bs...> {
     using type = typename concat<typelist<As...>,
                                  typename concat_many<B0, Bs...>::type>::type;
 };
+
+///
+/// Checks whether element is present in a given typelist.
+///
+template <typename AA, typename T> struct element_exists : std::false_type {};
+/// stop rule: metched
+template <typename... As, typename T>
+struct element_exists<typelist<T, As...>, T> : std::true_type {};
+///
+template <typename Ai, typename... As, typename T>
+struct element_exists<typelist<Ai, As...>, T>
+    : element_exists<typelist<As...>, T> {};
 
 ///
 ///
@@ -43,6 +58,8 @@ template <typename T> struct element_index<typelist<>, T> {
 /// stop rule: found
 template <typename... As, typename T>
 struct element_index<typelist<T, As...>, T> {
+    static_assert(element_exists<typelist<As...>, T>::value == false,
+                  "expect no duplicates");
     static constexpr auto value = 0u;
 };
 ///
@@ -52,18 +69,16 @@ struct element_index<typelist<Ai, As...>, T> {
 };
 
 ///
-/// Checks whether element is present in a given typelist.
+/// Check if given typelist has no duplicates
 ///
-/// TODO: consider implementation based on element_index<>
+template <typename AA> struct is_unique;
 ///
-template <typename AA, typename T> struct element_exists : std::false_type {};
-/// stop rule:
-template <typename... As, typename T>
-struct element_exists<typelist<T, As...>, T> : std::true_type {};
+template <> struct is_unique<typelist<>> : std::true_type {};
 ///
-template <typename Ai, typename... As, typename T>
-struct element_exists<typelist<Ai, As...>, T>
-    : element_exists<typelist<As...>, T> {};
+template <typename A0, typename... As> struct is_unique<typelist<A0, As...>> {
+    static constexpr bool value = !element_exists<typelist<As...>, A0>::value &&
+                                  is_unique<typelist<As...>>::value;
+};
 
 ///
 /// Returns a type of i-th element
@@ -117,7 +132,8 @@ struct index_if {
 };
 
 ///
-///
+/// Makes a sequence of indices [II], where Ii is a position of element
+///  Ai from list [AA] in a list [BB].
 ///
 template <typename AA, typename BB> struct make_index {
     template <typename II, typename XX> struct impl;

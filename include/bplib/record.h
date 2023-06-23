@@ -10,6 +10,7 @@ namespace bp {
 template <typename... Es> struct record {
     /// number of elements in the record
     static constexpr auto size = sizeof...(Es);
+
     /// defines whether record is empty or not
     static constexpr auto is_empty = (size == 0);
 
@@ -82,6 +83,15 @@ static constexpr auto element_exists_v = element_exists<R, E>::value;
 ///
 ///
 ///
+template <Record R> struct is_unique {
+    static constexpr auto value = bpx::is_unique<bp::to_typelist_t<R>>::value;
+};
+///
+template <Record R> static constexpr auto is_unique_v = is_unique<R>::value;
+
+///
+///
+///
 template <Record R, template <typename> class Pred, bool Exp = true>
 struct select_if {
     using type = bp::to_record_t<
@@ -113,6 +123,9 @@ template <Record R, Record Q> struct concat {
 ///
 template <Record R, Record Q> using concat_t = typename concat<R, Q>::type;
 
+///
+///
+///
 template <Record... Rs> struct concat_many {
     using type =
         to_record_t<typename bpx::concat_many<to_typelist_t<Rs>...>::type>;
