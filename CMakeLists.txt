@@ -11,10 +11,10 @@ set(CMAKE_CXX_EXTENSIONS NO)
 
 # setup compier options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    add_compile_options(-Wall -Wextra)
+    add_compile_options(-Wall -Wextra -pedantic)
     add_compile_options(-Werror)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall -Wextra)
+    add_compile_options(-Wall -Wextra -pedantic)
     add_compile_options(-Werror)
 else()
     message(FATAL_ERROR "Compiler ${CMAKE_CXX_COMPILER_ID} is not supported")
