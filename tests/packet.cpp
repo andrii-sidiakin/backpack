@@ -25,5 +25,11 @@ int main() {
         static_assert(std::is_same_v<decltype(f), float &>);
     }
 
+    {
+        auto [c, d] = p.select_index_outer(std::index_sequence<3, 1, 2>{});
+        static_assert(std::is_same_v<decltype(c), char &>);
+        static_assert(std::is_same_v<decltype(d), double &>);
+    }
+
     return 0;
 }
